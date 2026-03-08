@@ -8,7 +8,6 @@ import com.service.springbackend.model.User;
 import com.service.springbackend.repository.CommentRepository;
 import com.service.springbackend.repository.TicketRepository;
 import com.service.springbackend.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -73,6 +71,7 @@ public class CommentService {
                 comment.getId(),
                 comment.getTicket().getId(),
                 comment.getAuthor().getUsername(),
+                comment.getAuthor().getEmail(),
                 comment.getContent(),
                 comment.getCreatedAt()
         );

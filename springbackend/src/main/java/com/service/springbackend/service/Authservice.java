@@ -120,6 +120,6 @@ public class Authservice {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RuntimeException("Nutzer in Datenbank nicht gefunden"));
 
-        return new LoginResponse(user.getEmail(), user.getUsername(), token);
+        return new LoginResponse(user.getEmail(), user.getUsername(), user.getRole(), token);
     }
 }

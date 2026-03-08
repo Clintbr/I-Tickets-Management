@@ -12,28 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.service.springbackend.service.Authservice;
 
-import java.util.Map;
-
-
-/*
-
-# POST /auth/register
-# POST /auth/login
-
-# GET /users/{id}
-# GET /users
-
-# POST /tickets
-# GET /tickets
-# GET /tickets/{id}
-# UPDATE /tickets/{id}
-
-# POST /tickets/{ticketId}/comments
-# GET /tickets/{ticketId}/comments
-# DELETE /comments/{id}
-
- */
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

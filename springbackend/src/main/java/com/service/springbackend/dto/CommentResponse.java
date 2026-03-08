@@ -7,6 +7,7 @@ public record CommentResponse(
         UUID id,
         UUID ticketId,
         String authorUsername,
+        String authorMail,
         String content,
         LocalDateTime createdAt
 ) {}
