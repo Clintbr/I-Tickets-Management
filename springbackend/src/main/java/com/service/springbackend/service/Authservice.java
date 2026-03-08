@@ -8,7 +8,6 @@ import com.service.springbackend.model.Role;
 import com.service.springbackend.model.User;
 import com.service.springbackend.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,11 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -120,6 +117,6 @@ public class Authservice {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RuntimeException("Nutzer in Datenbank nicht gefunden"));
 
-        return new LoginResponse(user.getEmail(), user.getUsername(), user.getRole(), token);
+        return new LoginResponse(user.getId() ,user.getEmail(), user.getUsername(), user.getRole(), token);
     }
 }

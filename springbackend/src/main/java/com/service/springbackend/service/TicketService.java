@@ -1,11 +1,9 @@
 package com.service.springbackend.service;
 
+import com.service.springbackend.ai.TicketPriorityService;
 import com.service.springbackend.dto.TicketRequest;
 import com.service.springbackend.dto.TicketResponse;
-import com.service.springbackend.model.Role;
-import com.service.springbackend.model.Status;
-import com.service.springbackend.model.Ticket;
-import com.service.springbackend.model.User;
+import com.service.springbackend.model.*;
 import com.service.springbackend.repository.TicketRepository;
 import com.service.springbackend.repository.UserRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -20,13 +18,14 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final TicketPriorityService priorityService;
 
-    TicketService(TicketRepository ticketRepository, UserRepository userRepository) {
+    TicketService(TicketRepository ticketRepository, UserRepository userRepository, TicketPriorityService priorityService) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
+        this.priorityService = priorityService;
     }
 
-    // 200 OK: Wird automatisch gesendet, wenn die Liste zurückgegeben wird
     public List<TicketResponse> getAllMyTickets(Jwt jwt) {
         User currentUser = getCurrentUser(jwt);
         return ticketRepository.findByCreatedBy(currentUser)
@@ -35,7 +34,18 @@ public class TicketService {
                 .toList();
     }
 
-    // 404 Not Found: Wenn die ID nicht existiert
+    public List<TicketResponse> getAllTickets(Jwt jwt) {
+        User currentUser = getCurrentUser(jwt);
+        boolean hasAccess = currentUser.getRole().equals(Role.ADMIN) || currentUser.getRole().equals(Role.SUPPORT);
+
+        if (!hasAccess) throw new RuntimeException("Zugriff verweigert: Sie sind kein Support oder Admin");
+
+        return ticketRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     public TicketResponse getTicketById(UUID id, Jwt jwt) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket mit der ID " + id + " wurde nicht gefunden."));
@@ -44,17 +54,19 @@ public class TicketService {
 
     @Transactional
     public TicketResponse createTicket(TicketRequest request, Jwt jwt) {
-        User currentUser = getCurrentUser(jwt); // Kann 401/404 werfen
+        User currentUser = getCurrentUser(jwt);
 
         Ticket ticket = new Ticket();
         ticket.setTitle(request.title());
         ticket.setDescription(request.description());
         ticket.setStatus(Status.OPEN);
-        ticket.setPriority(request.priority() != null ? request.priority() : com.service.springbackend.model.Priority.MEDIUM);
+        Priority priority = priorityService.analyzePriority(
+                request.title() + " " + request.description()
+        );
+        ticket.setPriority(priority);
         ticket.setCreatedBy(currentUser);
 
         Ticket saved = ticketRepository.save(ticket);
-        // 201 Created: Wird im Controller über @ResponseStatus(HttpStatus.CREATED) gesteuert
         return mapToResponse(saved);
     }
 
@@ -63,17 +75,14 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket nicht gefunden."));
 
-        // 403 Forbidden: Logik für Berechtigungen
         String currentUserEmail = jwt.getClaimAsString("email");
         if (!ticket.getCreatedBy().getEmail().equals(currentUserEmail)) {
             throw new RuntimeException("Zugriff verweigert: Sie sind nicht der Besitzer dieses Tickets.");
         }
 
-        // 204 No Content: Wird im Controller nach erfolgreichem Löschen gesendet
         ticketRepository.delete(ticket);
     }
 
-    // 200 OK: Zeigt dem Support-Mitarbeiter seine zugewiesenen Tickets
     public List<TicketResponse> getTicketsAssignedToMe(Jwt jwt) {
         User currentUser = getCurrentUser(jwt);
         return ticketRepository.findByAssignedTo(currentUser)
@@ -83,21 +92,47 @@ public class TicketService {
     }
 
     @Transactional
-    public TicketResponse assignTicketToUser(UUID ticketId, UUID supportUserId) {
-        // 404 Fehler, falls das Ticket nicht existiert
+    public TicketResponse assignTicketToUser(UUID ticketId, UUID supportId, Jwt jwt) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ticket mit der ID " + ticketId + " nicht gefunden."));
 
-        // 404 Fehler, falls der Support-User nicht existiert
-        User supportUser = userRepository.findById(supportUserId)
-                .orElseThrow(() -> new RuntimeException("Support-Mitarbeiter mit der ID " + supportUserId + " nicht gefunden."));
+        User assignedSupportUser = userRepository.findById(supportId)
+                .orElseThrow(() -> new RuntimeException("User nicht gefunden"));
+        User supportUser = getCurrentUser(jwt);
 
-        ticket.setAssignedTo(supportUser);
+        boolean hasAccess = supportUser.getRole().equals(Role.ADMIN) || supportUser.getRole().equals(Role.SUPPORT);
+        if (!hasAccess) {
+            throw new RuntimeException("Zugriff verweigert: Sie sind kein Support oder Admin");
+        }
+        else if(ticket.getCreatedBy().equals(assignedSupportUser)) throw new RuntimeException("Zuweisung ungültig: Das Ticket gehört Ihnen");
+
+        ticket.setAssignedTo(assignedSupportUser);
         ticket.setStatus(Status.IN_PROGRESS);
 
         Ticket savedTicket = ticketRepository.save(ticket);
 
-        // Wir geben das gemappte DTO zurück, um den JSON-Error (ByteBuddy/Proxy) zu vermeiden
+        return mapToResponse(savedTicket);
+    }
+
+    @Transactional
+    public TicketResponse unassignTicket(UUID ticketId, Jwt jwt) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket mit der ID " + ticketId + " nicht gefunden."));
+
+
+        User assignedSupportUser = ticket.getAssignedTo();
+        if(assignedSupportUser == null) throw new RuntimeException("Aktion ungültig: Ticket ist nicht zugewiesen");
+        User supportUser = getCurrentUser(jwt);
+
+        boolean hasAccess = supportUser.getRole().equals(Role.ADMIN) || (supportUser.getRole().equals(Role.SUPPORT) && supportUser.getId() == assignedSupportUser.getId());
+        if (!hasAccess) {
+            throw new RuntimeException("Zugriff verweigert: Sie sind kein Admin oder das Ticket ist Ihnen nicht zugewiesen");
+        }
+
+        ticket.setAssignedTo(null);
+        ticket.setStatus(Status.OPEN);
+        Ticket savedTicket = ticketRepository.save(ticket);
+
         return mapToResponse(savedTicket);
     }
 
@@ -105,7 +140,6 @@ public class TicketService {
     public TicketResponse updateTicketStatus(UUID id, Status status, Jwt jwt) {
         User user = getCurrentUser(jwt);
 
-        // 403 Forbidden
         if (user.getRole() != Role.ADMIN && user.getRole() != Role.SUPPORT) {
             throw new RuntimeException("Nicht autorisiert: Nur Support oder Admins dürfen Statusänderungen vornehmen.");
         }
@@ -117,15 +151,29 @@ public class TicketService {
         return mapToResponse(ticketRepository.save(ticket));
     }
 
+    @Transactional
+    public TicketResponse updateTicketPriority(UUID id, Priority priority, Jwt jwt) {
+        User user = getCurrentUser(jwt);
 
-    // Hilfsmethode für 401/404
+        if (user.getRole() != Role.ADMIN && user.getRole() != Role.SUPPORT) {
+            throw new RuntimeException("Nicht autorisiert: Nur Support oder Admins dürfen Priority-Änderungen vornehmen.");
+        }
+
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket nicht gefunden."));
+
+        ticket.setPriority(priority);
+        return mapToResponse(ticketRepository.save(ticket));
+    }
+
+
     private User getCurrentUser(Jwt jwt) {
         if (jwt == null) {
-            throw new RuntimeException("Nicht authentifiziert: Token fehlt."); // 401
+            throw new RuntimeException("Nicht authentifiziert: Token fehlt.");
         }
         String email = jwt.getClaimAsString("email");
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Benutzerprofil in der Datenbank nicht gefunden.")); // 404
+                .orElseThrow(() -> new RuntimeException("Benutzerprofil in der Datenbank nicht gefunden."));
     }
 
     public TicketResponse mapToResponse(Ticket ticket) {
@@ -136,7 +184,7 @@ public class TicketService {
                 ticket.getStatus(),
                 ticket.getPriority(),
                 ticket.getCreatedBy().getUsername(),
-                ticket.getAssignedTo() != null ? ticket.getAssignedTo().getUsername() : "Nicht zugewiesen",
+                ticket.getAssignedTo() != null ? ticket.getAssignedTo().getUsername() : null,
                 ticket.getCreatedAt(),
                 ticket.getUpdatedAt()
         );

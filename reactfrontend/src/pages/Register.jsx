@@ -35,8 +35,7 @@ const Register = () => {
             setNotification({ message: 'Registrierung erfolgreich! Bitte einloggen.', type: 'success' });
             setTimeout(() => navigate('/login'), 2000);
         } catch (err) {
-            const errorMsg = err.response?.data?.message || 'Registrierung fehlgeschlagen.';
-            setNotification({ message: errorMsg, type: 'error' });
+            setNotification({ message: err.message, type: "error" });
         } finally {
             setIsLoading(false);
         }

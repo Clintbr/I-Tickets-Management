@@ -21,8 +21,8 @@ const Tickets = () => {
             const data = await ticketApi.getMyTickets();
             setTickets(data);
         } catch (err) {
-            setNotification({ message: 'Fehler beim Laden der Tickets.', type: 'error' });
-        } finally {
+            setNotification({ message: err.message, type: "error" });
+        }finally {
             setLoading(false);
         }
     };

@@ -3,7 +3,12 @@ package com.service.springbackend.controller;
 import com.service.springbackend.dto.StatusUpdateRequest;
 import com.service.springbackend.dto.TicketRequest;
 import com.service.springbackend.dto.TicketResponse;
+import com.service.springbackend.dto.UserResponse;
+import com.service.springbackend.model.Priority;
+import com.service.springbackend.model.Role;
 import com.service.springbackend.model.Ticket;
+import com.service.springbackend.model.User;
+import com.service.springbackend.repository.UserRepository;
 import com.service.springbackend.service.TicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +27,12 @@ public class TicketController {
 
     TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TicketResponse>> getAllTickets(@AuthenticationPrincipal Jwt jwt) {
+        List<TicketResponse> responses = ticketService.getAllTickets(jwt);
+        return ResponseEntity.ok(responses);
     }
 
     /**
@@ -73,14 +84,21 @@ public class TicketController {
     /**
      *
      * @param id
-     * @param supportUserId
+     * @param supportId
+     * @param jwt
      * @return
      */
-    @PatchMapping("/{id}/assign/{supportUserId}")
+    @PatchMapping("/{id}/assign/{supportId}")
     public ResponseEntity<TicketResponse> assignTicket(@PathVariable UUID id,
-                                               @PathVariable UUID supportUserId) {
-        return ResponseEntity.ok(ticketService.assignTicketToUser(id, supportUserId));
+                                                       @PathVariable UUID supportId,
+                                                       @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(ticketService.assignTicketToUser(id, supportId, jwt));
+    }
 
+    @PatchMapping("/{id}/unassign")
+    public ResponseEntity<TicketResponse> unassignTicket(@PathVariable UUID id,
+                                                       @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(ticketService.unassignTicket(id,jwt));
     }
 
     /**
@@ -97,6 +115,22 @@ public class TicketController {
             @AuthenticationPrincipal Jwt jwt) {
 
         return ResponseEntity.ok(ticketService.updateTicketStatus(id, request.status(), jwt));
+    }
+
+    /**
+     *
+     * @param id
+     * @param newPrio
+     * @param jwt
+     * @return
+     */
+    @PatchMapping("/{id}/priority")
+    public ResponseEntity<TicketResponse> updateTicketPriority(
+            @PathVariable UUID id,
+            @RequestParam Priority newPrio,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        return ResponseEntity.ok(ticketService.updateTicketPriority(id, newPrio, jwt));
     }
 
     /**

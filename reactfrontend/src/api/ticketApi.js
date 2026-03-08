@@ -11,9 +11,24 @@ export const ticketApi = {
         const response = await api.get('/tickets/my');
         return response.data;
     },
-    // GET /api/tickets/assigned (Für Support/Admins)
-    getAssigned: async () => {
+    // GET /api/tickets (Alle Tickets für Support/Admin)
+    getAllTickets: async () => {
+        const response = await api.get('/tickets');
+        return response.data;
+    },
+    // GET /api/tickets/assigned
+    getAssignedToMe: async () => {
         const response = await api.get('/tickets/assigned');
+        return response.data;
+    },
+    // PATCH /api/tickets/{id}/assign/{supportUserId}
+    assignToSupport: async (ticketId, supportUserId) => {
+        const response = await api.patch(`/tickets/${ticketId}/assign/${supportUserId}`);
+        return response.data;
+    },
+    // PATCH /api/tickets/{id}/assign/{supportUserId}
+    unassignTicket: async (ticketId) => {
+        const response = await api.patch(`/tickets/${ticketId}/unassign`);
         return response.data;
     },
     // GET /api/tickets/{id}
@@ -24,6 +39,13 @@ export const ticketApi = {
     // PATCH /api/tickets/{id}/status
     updateStatus: async (id, status) => {
         const response = await api.patch(`/tickets/${id}/status`, { status });
+        return response.data;
+    },
+    // PATCH /api/tickets/{id}/priority
+    updatePriority: async (id, newPrio) => {
+        const response = await api.patch(`/tickets/${id}/priority`, null, {
+            params: { newPrio }
+        });
         return response.data;
     },
     // DELETE /api/tickets/{id}

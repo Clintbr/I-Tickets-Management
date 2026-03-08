@@ -2,9 +2,7 @@ package com.service.springbackend.service;
 
 import com.service.springbackend.dto.CommentRequest;
 import com.service.springbackend.dto.CommentResponse;
-import com.service.springbackend.model.Comment;
-import com.service.springbackend.model.Ticket;
-import com.service.springbackend.model.User;
+import com.service.springbackend.model.*;
 import com.service.springbackend.repository.CommentRepository;
 import com.service.springbackend.repository.TicketRepository;
 import com.service.springbackend.repository.UserRepository;
@@ -33,6 +31,16 @@ public class CommentService {
         User user = getCurrentUser(jwt);
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new RuntimeException("Ticket nicht gefunden"));
+        if(ticket.getStatus().equals(Status.CLOSED))
+            throw new RuntimeException("Ticket ist schon geschloßen");
+        assert user.getId() != null;
+        if(!user.getId().equals(ticket.getCreatedBy().getId()) && user.getRole().equals(Role.USER))
+            throw new RuntimeException("Das Ticket gehört Ihnen nicht");
+        if(ticket.getAssignedTo() == null) {
+            if(user.getRole().equals(Role.SUPPORT))
+                throw new RuntimeException("Das Ticket ist noch niemandem zugewiesen");
+        } else if(!user.getId().equals(ticket.getAssignedTo().getId()) && user.getRole().equals(Role.SUPPORT))
+            throw new RuntimeException("Das Ticket ist Ihnen nicht zugewiesen");
 
         Comment comment = new Comment();
         comment.setContent(request.content());

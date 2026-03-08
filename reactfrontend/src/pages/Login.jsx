@@ -11,7 +11,9 @@ const Login = () => {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
+
     const handleSubmit = async (e) => {
+        localStorage.clear()
         e.preventDefault();
 
         if (formData.password.length < 6) {
@@ -34,7 +36,7 @@ const Login = () => {
             setNotification({ message: 'Erfolgreich angemeldet!', type: 'success' });
             setTimeout(() => navigate('/'), 1000);
         } catch (err) {
-            setNotification({ message: 'Login fehlgeschlagen. Daten prüfen.', type: 'error' });
+            setNotification({ message: err.message, type: "error" });
         } finally {
             setIsLoading(false);
         }

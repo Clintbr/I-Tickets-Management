@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import MainLayout from '../components/layout/MainLayout';
@@ -10,6 +10,7 @@ import Tickets from '../pages/Tickets';
 import TicketDetails from '../pages/TicketDetails';
 import SupportDashboard from '../pages/SupportDashboard';
 import AdminDashboard from '../pages/AdminDashboard';
+import AdminStats from "../pages/AdminStats.jsx";
 
 
 const AppRouter = () => {
@@ -18,7 +19,6 @@ const AppRouter = () => {
     if (loading) return <div className="flex h-screen items-center justify-center font-bold text-blue-600">Lade App-Daten...</div>;
 
     return (
-        <BrowserRouter>
             <Routes>
                 <Route path="/" element={<MainLayout />}>
                     <Route index element={<Home />} />
@@ -31,18 +31,26 @@ const AppRouter = () => {
 
                     <Route
                         path="support"
-                        element={user?.role === 'SUPPORT' || user?.role === 'ADMIN' ? <SupportDashboard /> : <Navigate to="/" />}
+                        element={user?.role === 'SUPPORT' || user?.role === 'ADMIN' ? <SupportDashboard view="all"/> : <Navigate to="/" />}
+                    />
+                    <Route
+                        path="support/assigned"
+                        element={user?.role === 'SUPPORT' || user?.role === 'ADMIN' ? <SupportDashboard view="assigned" /> : <Navigate to="/" />}
                     />
 
                     <Route
-                        path="admin"
+                        path="admin/users"
                         element={user?.role === 'ADMIN' ? <AdminDashboard /> : <Navigate to="/" />}
+                    />
+
+                    <Route
+                        path="admin/stats"
+                        element={user?.role === 'ADMIN' ? <AdminStats /> : <Navigate to="/" />}
                     />
 
                     <Route path="*" element={<Navigate to="/" />} />
                 </Route>
             </Routes>
-        </BrowserRouter>
     );
 };
 

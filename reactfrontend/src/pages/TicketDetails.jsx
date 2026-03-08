@@ -26,7 +26,7 @@ const TicketDetails = () => {
                 setTicket(ticketData);
                 setComments(commentsData);
             } catch (err) {
-                setNotification({ message: 'Daten konnten nicht geladen werden.', type: 'error' });
+                setNotification({ message: err.message, type: "error" });
             } finally {
                 setLoading(false);
             }
@@ -44,7 +44,7 @@ const TicketDetails = () => {
             setComments([...comments, addedComment]);
             setNewComment('');
         } catch (err) {
-            setNotification({ message: 'Nachricht konnte nicht gesendet werden.', type: 'error' });
+            setNotification({ message: err.message, type: "error" });
         } finally {
             setSending(false);
         }
@@ -58,7 +58,7 @@ const TicketDetails = () => {
             setTicket(updatedTicket); // UI aktualisiert sich sofort
             setNotification({ message: 'Ticket erfolgreich geschlossen.', type: 'success' });
         } catch (err) {
-            setNotification({ message: 'Status konnte nicht geändert werden.', type: 'error' });
+            setNotification({ message: err.message, type: "error" });
         }
     };
 
@@ -70,10 +70,17 @@ const TicketDetails = () => {
             setComments(comments.filter(c => c.id !== commentId));
             setNotification({ message: 'Kommentar gelöscht.', type: 'info' });
         } catch (err) {
-            setNotification({
-                message: 'Löschen fehlgeschlagen. Eventuell fehlen die Rechte.',
-                type: 'error'
-            });
+            setNotification({ message: err.message, type: "error" });
+        }
+    };
+
+    const getPriorityStyle = (priority) => {
+        switch (priority) {
+            case 'LOW': return 'bg-slate-100 text-slate-600 border-slate-200';
+            case 'MEDIUM': return 'bg-blue-50 text-blue-600 border-blue-200';
+            case 'HIGH': return 'bg-orange-50 text-orange-600 border-orange-200';
+            case 'URGENT': return 'bg-red-100 text-red-700 border-red-200 animate-pulse';
+            default: return 'bg-slate-100 text-slate-600';
         }
     };
 
@@ -106,13 +113,20 @@ const TicketDetails = () => {
                             className="text-xs font-mono text-slate-400 uppercase tracking-widest">Ticket ID: {id.substring(0, 8)}...</span>
                         <h1 className="text-2xl font-bold text-slate-900 mt-1">{ticket.title}</h1>
                     </div>
-                    <span className={`px-4 py-1.5 rounded-full text-sm font-bold border ${
-                        ticket.status === 'OPEN' ? 'bg-blue-100 text-blue-700 border-blue-200' :
-                            ticket.status === 'CLOSED' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                                'bg-amber-100 text-amber-700 border-amber-200'
-                    }`}>
-                        {ticket.status}
-                    </span>
+                    <div className="flex gap-2">
+                        <span
+                            className={`px-3 py-1 rounded-lg text-xs font-black border ${getPriorityStyle(ticket.priority)}`}>
+                            {ticket.priority}
+                        </span>
+
+                        <span className={`px-3 py-1 rounded-lg text-xs font-black border ${
+                            ticket.status === 'OPEN' ? 'bg-blue-600 text-white border-blue-600' :
+                                ticket.status === 'CLOSED' ? 'bg-slate-600 text-white border-slate-600' :
+                                    'bg-amber-500 text-white border-amber-500'
+                        }`}>
+                            {ticket.status}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="p-6">
