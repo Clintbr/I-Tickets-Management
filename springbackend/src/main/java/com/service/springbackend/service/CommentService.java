@@ -37,7 +37,7 @@ public class CommentService {
         if(!user.getId().equals(ticket.getCreatedBy().getId()) && user.getRole().equals(Role.USER))
             throw new RuntimeException("Das Ticket gehört Ihnen nicht");
         if(ticket.getAssignedTo() == null) {
-            if(user.getRole().equals(Role.SUPPORT))
+            if(user.getRole().equals(Role.SUPPORT) && !user.getId().equals(ticket.getCreatedBy().getId()))
                 throw new RuntimeException("Das Ticket ist noch niemandem zugewiesen");
         } else if(!user.getId().equals(ticket.getAssignedTo().getId()) && user.getRole().equals(Role.SUPPORT))
             throw new RuntimeException("Das Ticket ist Ihnen nicht zugewiesen");

@@ -103,9 +103,16 @@ const Sidebar = () => {
             <div className="p-4 border-t border-slate-800 bg-slate-900/50">
                 {!user ? (
                     <div className="space-y-2">
-                        <NavLink to="/login" className="block w-full text-center py-2 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition">
+                        <NavLink to="/login"
+                                 className="block w-full text-center py-2 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition">
                             Anmelden
                         </NavLink>
+                        <div className="space-y-2">
+                            <NavLink to="/register"
+                                     className="block w-full text-center py-2 bg-blue-900 hover:bg-blue-700 rounded-xl font-bold transition">
+                                Registrieren
+                            </NavLink>
+                        </div>
                     </div>
                 ) : (
                     <div className="space-y-4">
