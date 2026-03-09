@@ -94,7 +94,7 @@ const AdminDashboard = () => {
                 />
             </div>
 
-            {/* Desktop: Drag and Drop Columns */}
+            {/* Desktop:*/}
             <div className="hidden lg:block">
                 <DragDropContext onDragEnd={onDragEnd}>
                     <div className="grid grid-cols-3 gap-6">
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
                 </DragDropContext>
             </div>
 
-            {/* Mobile View: Simple List with Role Switcher */}
+            {/* Mobile View:*/}
             <div className="lg:hidden space-y-4">
                 {filteredUsers.map(user => (
                     <div key={user.id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">

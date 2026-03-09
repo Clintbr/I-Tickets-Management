@@ -14,7 +14,8 @@ const Footer = () => {
                             Ticket<span className="text-blue-600">System</span>
                         </h2>
                         <p className="text-sm text-slate-500 mt-1">
-                            Entwickelt von <span className="font-bold text-slate-700 underline decoration-blue-300">Clint Bryan Nguena</span>
+                            Entwickelt von <span className="font-bold text-slate-700 underline decoration-blue-300">Clint Bryan Nguena</span> <br/>
+                            Engineer and Software-developer Junior
                         </p>
                     </div>
 
@@ -37,7 +38,8 @@ const Footer = () => {
 
                 <div className="mt-8 pt-4 border-t border-slate-50 text-center">
                     <p className="text-[10px] text-slate-300 uppercase tracking-[0.2em]">
-                        Precision Engineering & UI Design
+                        Precision Engineering & UI Design <br/>
+                        <span className="text-blue-300"> Version 1.0.0</span>
                     </p>
                 </div>
             </div>
