@@ -1,76 +1,92 @@
-# 🚀 TicketSystem: Enterprise Ticket Management System
+# 🚀 TicketSystem: Enterprise Ticket Management System for Support Team
 
-**TicketSystem** ist eine hochperformante Full-Stack-Lösung zur Optimierung von Kundensupport-Workflows. Das System vereint administrative Kontrolle, datengestützte Analysen und ein intuitives Benutzererlebnis in einer modernen Web-Architektur.
-
-## 🛠 Kernfunktionalitäten
-
-### 1. Intelligentes Support-Dashboard
-
-Das Zentrum für Support-Mitarbeiter. Es ermöglicht eine effiziente Ticket-Verwaltung durch:
-
-* **Ticket-Lifecycle:** Nahtloses Übernehmen (Assign) und Freigeben (Unassign) von Tickets.
-* **Rollenbasierte Sichtbarkeit:** Differenzierte Ansichten für "Eigene Aufgaben" vs. den globalen Ticket-Pool.
-* **Echtzeit-Status-Updates:** Sofortige Rückmeldung über Ticket-Zustände (`OPEN`, `IN_PROGRESS`, `CLOSED`).
-
-### 2. Administrative Benutzerverwaltung (Drag-and-Drop)
-
-Ein High-End-Feature für Admins zur dynamischen Rollenverteilung:
-
-* **Kanban-Style Management:** Verschieben von Nutzern zwischen den Rollen `USER`, `SUPPORT` und `ADMIN` per Drag-and-Drop.
-* **Sicherheits-Validierung:** Jede Änderung wird im Backend gegen JWT-Claims und Rollenberechtigungen geprüft.
-* **Responsive UX:** Vollwertige Drag-and-Drop-Funktion am Desktop, intuitive Umschalter in der mobilen Ansicht.
-
-### 3. Business Analytics & Reporting
-
-Datengesteuerte Entscheidungen durch visuelle Aufbereitung:
-
-* **Live-Metriken:** Echtzeit-Counter für Systemnutzer und Ticket-Quoten.
-* **Historische Analyse:** Ein responsives Area-Chart (Recharts), das Ticket-Trends über Monate hinweg visualisiert.
-* **PostgreSQL Optimized:** Hochperformante Aggregation der Daten direkt auf Datenbankebene mittels optimierter `TO_CHAR`-Abfragen.
+**TicketSystem** is a high-performance full-stack solution designed to optimize customer support workflows. The system combines administrative control, data-driven analytics, and an intuitive user experience within a modern web architecture.
 
 ---
 
-## 🧠 AI-Driven Prioritization (Local Engine)
+# 🛠 Core Features
 
-Ein besonderes Highlight dieses Projekts ist die **KI-ähnliche Priorisierungs-Logik**, die direkt im Spring Boot Backend implementiert wurde:
+## 1. Intelligent Support Dashboard
 
-* **Zero-API-Latency:** Im Gegensatz zu externen KI-Diensten fallen keine Kosten oder Latenzen an. Die Logik läuft nativ auf dem Server.
-* **Heuristische Analyse:** Das System analysiert Ticket-Inhalte, Schlagwörter und die Historie des Erstellers, um automatisch Prioritäten (`LOW` bis `URGENT`) vorzuschlagen.
-* **Business Rules Engine:** Prioritäten werden dynamisch angepasst, basierend auf der Zeit seit der Erstellung und dem Kundenstatus, um SLAs (Service Level Agreements) einzuhalten.
+The central hub for support agents. It enables efficient ticket management through:
 
----
-
-## 📈 Mehrwert für den Business-Workflow
-
-| Feature | Business-Nutzen |
-| --- | --- |
-| **Zentrales Dashboard** | Reduziert die Ticket-Reaktionszeit (First Response Time) durch klare Zuweisungen. |
-| **Native Priorisierung** | Garantiert, dass kritische Probleme (`URGENT`) sofort bearbeitet werden, ohne manuelle Triage. |
-| **Admin-Statistiken** | Identifiziert Engpässe im Support-Team und hilft bei der Ressourcenplanung. |
-| **Responsive Design** | Ermöglicht Support-Mitarbeitern volle Handlungsfähigkeit auch auf mobilen Endgeräten. |
+* **Ticket Lifecycle:** Seamless assigning and unassigning of tickets.
+* **Role-Based Visibility:** Distinct views for **"My Tasks"** versus the global ticket pool.
+* **Real-Time Status Updates:** Immediate feedback on ticket states (`OPEN`, `IN_PROGRESS`, `CLOSED`).
 
 ---
 
-## 🗺️ Roadmap: Zukünftige Features
+## 2. Administrative User Management (Drag and Drop)
 
-Um die Plattform zu vervollständigen auszubauen, sind folgende Erweiterungen geplant:
+A high-end feature for administrators to dynamically manage user roles:
 
-* **Profilkontoverwaltung:** Ein persönlicher Bereich für Nutzer zum Verwalten von Avataren, Passwörtern und persönlichen Präferenzen.
-* **E-Mail-Notifikationen:** Automatische Benachrichtigung per SMTP bei Ticket-Zuweisung, Statusänderungen oder kritischen Eskalationen.
-* **PDF-Exporte:** Generierung von professionellen Ticket-Zusammenfassungen für Kunden und monatlichen Performance-Berichten für das Management.
-
----
-
-## 💻 Tech Stack
-
-* **Frontend:** React 18, Tailwind CSS, Recharts, `@hello-pangea/dnd`.
-* **Backend:** Java 21, Spring Boot 3, Spring Security (JWT & OAuth2).
-* **Datenbank:** PostgreSQL.
-* **Icons:** Lucide-React.
+* **Kanban-Style Management:** Move users between the roles `USER`, `SUPPORT`, and `ADMIN` using drag-and-drop.
+* **Security Validation:** Every change is validated in the backend against JWT claims and role permissions.
+* **Responsive UX:** Full drag-and-drop functionality on desktop and intuitive toggle controls on mobile devices.
 
 ---
 
-### ⚙️ Installation & Start
+## 3. Business Analytics & Reporting
 
-1. **Backend:** `./mvnw spring-boot:run`
-2. **Frontend:** `npm install` -> `npm run dev`
+Make data-driven decisions with visual insights:
+
+* **Live Metrics:** Real-time counters for system users and ticket statistics.
+* **Historical Analysis:** A responsive area chart (Recharts) visualizing ticket trends over several months.
+* **PostgreSQL Optimized:** High-performance data aggregation directly at the database level using optimized `TO_CHAR` queries.
+
+---
+
+# 🧠 AI-Driven Prioritization (Local Engine)
+
+One of the highlights of this project is the **AI-like prioritization logic**, implemented directly within the Spring Boot backend:
+
+* **Zero API Latency:** Unlike external AI services, this approach avoids additional costs and latency. The logic runs natively on the server.
+* **Heuristic Analysis:** The system analyzes ticket content, keywords, and the creator’s history to automatically suggest priorities (`LOW` to `URGENT`).
+* **Business Rules Engine:** Priorities are dynamically adjusted based on time since creation and customer status to maintain SLAs (Service Level Agreements).
+
+---
+
+# 📈 Business Value
+
+| Feature                   | Business Benefit                                                                     |
+| ------------------------- | ------------------------------------------------------------------------------------ |
+| **Centralized Dashboard** | Reduces ticket response time (First Response Time) through clear ticket assignments. |
+| **Native Prioritization** | Ensures critical issues (`URGENT`) are handled immediately without manual triage.    |
+| **Admin Analytics**       | Identifies bottlenecks within the support team and supports resource planning.       |
+| **Responsive Design**     | Enables support agents to work efficiently even on mobile devices.                   |
+
+---
+
+# 🗺️ Roadmap: Future Features
+
+To further expand the platform, the following features are planned:
+
+* **Profile Management:** A personal area for users to manage avatars, passwords, and personal preferences.
+* **Email Notifications:** Automatic SMTP notifications for ticket assignments, status changes, or critical escalations.
+* **PDF Exports:** Generation of professional ticket summaries for customers and monthly performance reports for management.
+
+---
+
+# 💻 Tech Stack
+
+* **Frontend:** React 18, Tailwind CSS, Recharts, `@hello-pangea/dnd`
+* **Backend:** Java 21, Spring Boot 3, Spring Security (JWT & OAuth2)
+* **Database:** PostgreSQL
+* **Icons:** Lucide React
+
+---
+
+# ⚙️ Installation & Setup
+
+### 1. Backend
+
+```bash
+./mvnw spring-boot:run
+```
+
+### 2. Frontend
+
+```bash
+npm install
+npm run dev
+```
