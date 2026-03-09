@@ -1,44 +1,70 @@
 # 🛡️ Security Documentation: TicketSystem
 
-Sicherheit steht bei **TicketSystem** an erster Stelle. Dieses Dokument beschreibt die implementierten Sicherheitsmaßnahmen zum Schutz von Benutzerdaten, API-Endpunkten und der geschäftskritischen Priorisierungs-Logik.
-
-## 🔐 Authentifizierung & Autorisierung
-
-Das System nutzt einen **Stateless Security Ansatz** basierend auf modernen Industriestandards:
-
-* **JWT (JSON Web Tokens):** Die Kommunikation zwischen Frontend und Backend erfolgt über kryptografisch signierte Tokens. Dies verhindert Session-Hijacking und ermöglicht eine skalierbare Authentifizierung.
-* **RBAC (Role-Based Access Control):** Der Zugriff auf Ressourcen ist streng nach Rollen getrennt:
-* `USER`: Erstellen und Einsehen eigener Tickets.
-* `SUPPORT`: Bearbeitung und Zuweisung von Tickets.
-* `ADMIN`: Volle Kontrolle über Benutzerrollen, Systemstatistiken und globale Prioritäten.
-
-
-* **Method-Level Security:** Im Backend wird jeder Service-Aufruf durch `@PreAuthorize`-Annotationen geschützt, um unbefugte Zugriffe auf Controller-Ebene zu verhindern.
-
-## 🛡️ Backend-Schutzmechanismen (Spring Boot)
-
-* **Password Hashing:** Passwörter werden niemals im Klartext gespeichert. Wir nutzen **BCrypt** mit einem starken Salt-Faktor, um Brute-Force-Angriffe zu erschweren.
-* **CORS Policy:** Die API akzeptiert nur Anfragen von verifizierten Domains (Cross-Origin Resource Sharing), um Cross-Site-Request-Forgery (CSRF) zu minimieren.
-* **SQL Injection Prevention:** Durch den Einsatz von **Spring Data JPA** und vorbereiteten Statements (Prepared Statements) ist das System nativ gegen SQL-Injection-Angriffe geschützt.
-* **Input Validation:** Alle eingehenden Daten werden mittels `@Valid` und Jakarta Bean Validation geprüft, um Malformed-Data-Angriffe zu verhindern.
-
-## 🧠 Sicherheit der internen KI-Logik
-
-Ein entscheidender Sicherheitsvorteil der **lokal implementierten Priorisierungs-Engine**:
-
-* **Datensouveränität:** Da keine externen AI-APIs (wie OpenAI oder Anthropic) genutzt werden, verlassen keine sensiblen Ticket-Inhalte das interne Netzwerk.
-* **Manipulation-Protection:** Die Logik zur Priorisierung ist tief im Backend gekapselt und für Endnutzer nicht manipulierbar. Nur Admins können die Gewichtung der Heuristiken beeinflussen.
+Security is a top priority for **TicketSystem**.
+This document outlines the implemented security measures designed to protect user data, API endpoints, and the business-critical prioritization logic.
 
 ---
 
-## 🏗️ Infrastruktur & Deployment Empfehlungen
+# 🔐 Authentication & Authorization
 
-Für den produktiven Einsatz sollten folgende Maßnahmen ergriffen werden:
+The system follows a **stateless security approach** based on modern industry standards:
 
-1. **SSL/TLS Verschlüsselung:** Alle Verbindungen müssen zwingend über HTTPS laufen.
-2. **Environment Variables:** Sensible Daten wie der `JWT_SECRET` oder Datenbank-Logins dürfen niemals im Code stehen, sondern müssen über Umgebungsvariablen geladen werden.
-3. **Rate Limiting:** Implementierung eines Rate-Limiters, um die API gegen DoS-Angriffe (Denial of Service) zu schützen.
+* **JWT (JSON Web Tokens):**
+  Communication between the frontend and backend is handled using cryptographically signed tokens. This prevents session hijacking and enables scalable authentication.
+
+* **RBAC (Role-Based Access Control):**
+  Access to resources is strictly separated by roles:
+
+  * `USER`: Create and view their own tickets
+  * `SUPPORT`: Process and assign tickets
+  * `ADMIN`: Full control over user roles, system statistics, and global priorities
+
+* **Method-Level Security:**
+  Every backend service call is protected using `@PreAuthorize` annotations to prevent unauthorized access at the controller and service layer.
 
 ---
 
-> **Hinweis:** Sicherheit ist ein fortlaufender Prozess. Regelmäßige Updates der Abhängigkeiten (Dependencies) mittels Tools wie `npm audit` oder Snyk werden dringend empfohlen.
+# 🛡️ Backend Protection Mechanisms (Spring Boot)
+
+* **Password Hashing:**
+  Passwords are never stored in plain text. The system uses **BCrypt** with a strong salt factor to protect against brute-force attacks.
+
+* **CORS Policy:**
+  The API only accepts requests from verified domains (Cross-Origin Resource Sharing) to minimize the risk of Cross-Site Request Forgery (CSRF).
+
+* **SQL Injection Prevention:**
+  By using **Spring Data JPA** and prepared statements, the system is natively protected against SQL injection attacks.
+
+* **Input Validation:**
+  All incoming data is validated using `@Valid` and Jakarta Bean Validation to prevent malformed-data attacks.
+
+---
+
+# 🧠 Security of the Internal AI Logic
+
+A major security advantage of the **locally implemented prioritization engine**:
+
+* **Data Sovereignty:**
+  Since no external AI APIs (such as OpenAI or Anthropic) are used, sensitive ticket content never leaves the internal network.
+
+* **Manipulation Protection:**
+  The prioritization logic is deeply encapsulated within the backend and cannot be manipulated by end users. Only administrators can influence heuristic weightings.
+
+---
+
+# 🏗️ Infrastructure & Deployment Recommendations
+
+For production deployments, the following security measures are recommended:
+
+1. **SSL/TLS Encryption:**
+   All connections must be secured using HTTPS.
+
+2. **Environment Variables:**
+   Sensitive data such as `JWT_SECRET` or database credentials must never be stored in the source code and should instead be loaded via environment variables.
+
+3. **Rate Limiting:**
+   Implement an API rate limiter to protect the system against Denial-of-Service (DoS) attacks.
+
+---
+
+> **Note:** Security is an ongoing process. Regular dependency updates using tools such as `npm audit` or Snyk are strongly recommended.
